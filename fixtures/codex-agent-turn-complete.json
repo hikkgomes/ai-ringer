@@ -1,0 +1,6 @@
+{
+  "type": "agent-turn-complete",
+  "turn-id": "codex-turn-123",
+  "cwd": "/Users/example/src/webhooks",
+  "last-assistant-message": "Fixed the flaky retry test and tightened the timeout assertion."
+}

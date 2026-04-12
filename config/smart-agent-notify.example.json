@@ -1,0 +1,15 @@
+{
+  "quiet": {
+    "enabled": false,
+    "from": "22:00",
+    "to": "07:00"
+  },
+  "dedupeWindowMs": 10000,
+  "macos": {
+    "sound": "default",
+    "experimentalAppIcon": false
+  },
+  "linux": {
+    "iconThemeFallback": "applications-development"
+  }
+}

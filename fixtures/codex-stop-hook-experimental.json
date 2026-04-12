@@ -1,0 +1,6 @@
+{
+  "hook_event_name": "Stop",
+  "session_id": "codex-session-experimental",
+  "cwd": "/Users/example/src/webhooks",
+  "last_assistant_message": "Updated the webhook parser to reject malformed signatures."
+}

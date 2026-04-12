@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+import { existsSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const entry = resolve(root, "dist/src/index.js");
+
+if (!existsSync(entry)) {
+  execFileSync("npm", ["run", "build"], { cwd: root, stdio: "inherit" });
+}
+
+execFileSync(process.execPath, [entry, "uninstall", ...process.argv.slice(2)], {
+  cwd: root,
+  stdio: "inherit"
+});

@@ -1,0 +1,31 @@
+{
+  "name": "smart-agent-notify",
+  "version": "0.1.0",
+  "description": "Smart local desktop notifications for Claude Code and Codex.",
+  "type": "module",
+  "bin": {
+    "smart-agent-notify": "dist/src/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test dist/test/*.test.js",
+    "setup": "node scripts/install.mjs",
+    "install:local": "npm run build && node dist/src/index.js install",
+    "uninstall": "node scripts/uninstall.mjs",
+    "uninstall:local": "npm run build && node dist/src/index.js uninstall"
+  },
+  "keywords": [
+    "claude-code",
+    "codex",
+    "notifications",
+    "developer-tools"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.10"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "typescript": "^5.8.3"
+  }
+}

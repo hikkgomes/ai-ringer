@@ -1,0 +1,7 @@
+{
+  "session_id": "claude-session-789",
+  "transcript_path": "/Users/example/.claude/projects/infra-tools/transcript.jsonl",
+  "cwd": "/Users/example/src/infra-tools",
+  "hook_event_name": "Elicitation",
+  "prompt": "Choose the target environment for deployment."
+}

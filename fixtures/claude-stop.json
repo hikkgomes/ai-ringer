@@ -1,0 +1,8 @@
+{
+  "session_id": "claude-session-123",
+  "transcript_path": "/Users/example/.claude/projects/payments-api/transcript.jsonl",
+  "cwd": "/Users/example/src/payments-api",
+  "hook_event_name": "Stop",
+  "stop_hook_active": false,
+  "last_assistant_message": "Added retry logic to the webhook handler and updated the related tests."
+}
