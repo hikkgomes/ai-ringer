@@ -148,6 +148,7 @@ The summary builder uses, in order:
 - project name derived from `cwd`.
 
 Titles are kept short and contextual. Repeated identical events are deduped for 10 seconds in `~/.smart-agent-notify/state.json`.
+Every generated title starts with `Claude:` or `Codex:` because macOS and Linux notification shells often show the notifier app identity rather than the agent identity.
 
 ## Click Behavior
 

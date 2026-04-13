@@ -17,7 +17,7 @@ test("Claude permission request becomes an approval notification", () => {
 
   assert.equal(event.eventType, "approval_required");
   assert.equal(event.projectName, "payments-api");
-  assert.match(event.title ?? "", /Waiting for approval: run npm test/);
+  assert.match(event.title ?? "", /^Claude: waiting for approval - run npm test/);
   assert.equal(event.clickTarget?.supported, "official-vscode-url");
 });
 
@@ -33,6 +33,7 @@ test("Claude stop event uses assistant message for context", () => {
   );
 
   assert.equal(event.eventType, "completed");
+  assert.match(event.title ?? "", /^Claude:/);
   assert.match(event.title ?? "", /Refactored token refresh/);
   assert.match(event.title ?? "", /auth-service/);
 });
@@ -61,5 +62,6 @@ test("Codex notify payload becomes a completed event", () => {
   assert.equal(event.provider, "codex");
   assert.equal(event.eventType, "completed");
   assert.equal(event.threadId, "t1");
+  assert.match(event.title ?? "", /^Codex:/);
   assert.match(event.title ?? "", /Fixed retry behavior/);
 });

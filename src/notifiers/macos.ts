@@ -22,7 +22,7 @@ export function notifyMacOS(event: NormalizedEvent): NotifyResult {
     `smart-agent-notify.${event.provider}.${event.sessionId ?? event.threadId ?? event.eventType}`
   ];
 
-  if (event.projectName) args.push("-subtitle", event.projectName);
+  args.push("-subtitle", event.projectName ? `${providerLabel(event)} - ${event.projectName}` : providerLabel(event));
   if (event.clickTarget?.uri) args.push("-open", event.clickTarget.uri);
   if (process.env.SMART_AGENT_NOTIFY_SOUND !== "off") args.push("-sound", "default");
 
@@ -44,4 +44,8 @@ export function notifyMacOS(event: NormalizedEvent): NotifyResult {
     method: "macos-terminal-notifier",
     detail: result.status === 0 ? undefined : result.stderr.trim() || result.stdout.trim()
   };
+}
+
+function providerLabel(event: NormalizedEvent): string {
+  return event.provider === "claude" ? "Claude" : "Codex";
 }

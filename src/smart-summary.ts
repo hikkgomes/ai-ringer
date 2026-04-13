@@ -22,20 +22,20 @@ export function enrichEvent(rawEvent: NormalizedEvent): NormalizedEvent {
     switch (event.eventType) {
       case "completed":
         event.title ??= titleSummary
-          ? completedTitle(titleSummary, project)
+          ? completedTitle(provider, titleSummary, project)
           : truncate(`${provider} finished work in ${project}`, 72);
         event.body ??= bodyFor(event, summary || "Open the project to review the final response.");
         break;
       case "approval_required":
-        event.title ??= truncate(`Waiting for approval: ${summary || provider}`, 72);
+        event.title ??= truncate(`${provider}: waiting for approval - ${summary || project}`, 72);
         event.body ??= bodyFor(event, "Review the requested action and approve or deny it in the agent.");
         break;
       case "input_required":
-        event.title ??= truncate(`Need your input: ${summary || project}`, 72);
+        event.title ??= truncate(`${provider}: need your input - ${summary || project}`, 72);
         event.body ??= bodyFor(event, "Respond in the agent session to continue.");
         break;
       case "failure":
-        event.title ??= truncate(`${provider} hit a problem in ${project}`, 72);
+        event.title ??= truncate(`${provider}: hit a problem in ${project}`, 72);
         event.body ??= bodyFor(event, summary || "Open the project to inspect the failure.");
         break;
       case "info":
@@ -45,7 +45,7 @@ export function enrichEvent(rawEvent: NormalizedEvent): NormalizedEvent {
     }
   }
 
-  event.title = truncate(event.title ?? `${provider} notification`, 72);
+  event.title = truncate(ensureProviderPrefix(event.title ?? `${provider} notification`, provider), 72);
   event.body = truncate(event.body ?? "", 180);
   event.dedupeKey = dedupeKey(event);
   return event;
@@ -92,10 +92,17 @@ function stripTrailingPunctuation(value: string): string {
   return value.replace(/[.!?]+$/g, "").trim();
 }
 
-function completedTitle(summary: string, project: string): string {
+function completedTitle(provider: string, summary: string, project: string): string {
   const suffix = ` in ${project}`;
-  const available = Math.max(24, 72 - suffix.length);
-  return `${truncate(sentenceCase(summary), available)}${suffix}`;
+  const prefix = `${provider}: `;
+  const available = Math.max(24, 72 - prefix.length - suffix.length);
+  return `${prefix}${truncate(sentenceCase(summary), available)}${suffix}`;
+}
+
+function ensureProviderPrefix(title: string, provider: string): string {
+  return title.startsWith(`${provider}:`) || title.startsWith(`${provider} `)
+    ? title
+    : `${provider}: ${title}`;
 }
 
 function defaultIcon(provider: NormalizedEvent["provider"]): string {

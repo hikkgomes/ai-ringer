@@ -72,7 +72,7 @@ export function runLinuxNotifyChild(event: NormalizedEvent): number {
 
 function baseNotifySendArgs(event: NormalizedEvent): string[] {
   const args = [
-    "--app-name=Smart Agent Notify",
+    `--app-name=${providerLabel(event)}`,
     "--category=development",
     "--hint=string:x-canonical-private-synchronous:smart-agent-notify",
     event.title ?? "Agent notification",
@@ -81,6 +81,10 @@ function baseNotifySendArgs(event: NormalizedEvent): string[] {
 
   if (event.iconTarget) args.unshift(`--icon=${event.iconTarget}`);
   return args;
+}
+
+function providerLabel(event: NormalizedEvent): string {
+  return event.provider === "claude" ? "Claude Code" : "Codex";
 }
 
 function notifySendSupportsActions(): boolean {
