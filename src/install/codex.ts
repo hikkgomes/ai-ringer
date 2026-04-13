@@ -63,7 +63,7 @@ function codexManagedBlock(): string {
     .map((part) => JSON.stringify(part))
     .join(", ");
   return `${MANAGED_START}
-# Official Codex notify command. Codex invokes this only for agent-turn-complete.
+# Official Codex notify command. smart-agent-notify ignores non-completion lifecycle events.
 notify = [${command}]
 ${MANAGED_END}`;
 }

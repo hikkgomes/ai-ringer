@@ -6,8 +6,8 @@ export function normalizeCodexEvent(input: unknown): NormalizedEvent | undefined
   const type =
     stringValue(raw.type) ??
     stringValue(raw.event) ??
-    stringValue(raw.hook_event_name) ??
-    "agent-turn-complete";
+    stringValue(raw.hook_event_name);
+  const eventName = normalizeEventName(type);
   const cwd =
     stringValue(raw.cwd) ??
     stringValue(raw.working_dir) ??
@@ -30,7 +30,7 @@ export function normalizeCodexEvent(input: unknown): NormalizedEvent | undefined
     raw: input
   };
 
-  if (type === "agent-turn-complete" || type === "Stop") {
+  if (isCompletionEvent(eventName)) {
     return {
       ...base,
       eventType: "completed",
@@ -38,7 +38,7 @@ export function normalizeCodexEvent(input: unknown): NormalizedEvent | undefined
     };
   }
 
-  if (type === "StopFailure") {
+  if (isFailureEvent(eventName)) {
     return {
       ...base,
       eventType: "failure",
@@ -49,11 +49,7 @@ export function normalizeCodexEvent(input: unknown): NormalizedEvent | undefined
     };
   }
 
-  return {
-    ...base,
-    eventType: "info",
-    rawSummarySource: stringValue(raw.message) ?? type
-  };
+  return undefined;
 }
 
 function lastAssistantText(raw: Record<string, unknown>): string | undefined {
@@ -64,4 +60,16 @@ function lastAssistantText(raw: Record<string, unknown>): string | undefined {
     stringValue(raw.message) ??
     stringValue(raw.summary)
   );
+}
+
+function normalizeEventName(value: string | undefined): string | undefined {
+  return value?.trim().replace(/[_\s]+/g, "-").toLowerCase();
+}
+
+function isCompletionEvent(eventName: string | undefined): boolean {
+  return eventName === "agent-turn-complete" || eventName === "stop";
+}
+
+function isFailureEvent(eventName: string | undefined): boolean {
+  return eventName === "agent-turn-failed" || eventName === "stopfailure" || eventName === "stop-failure";
 }

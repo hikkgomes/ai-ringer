@@ -9,7 +9,7 @@ This repo builds one small CLI, `smart-agent-notify`, with provider-specific pay
 Verified on 2026-04-13 against current official docs:
 
 - Claude Code has documented hooks for `Stop`, `StopFailure`, `PermissionRequest`, `Notification`, `SubagentStop`, `TaskCompleted`, and `Elicitation`. Hook payloads include `session_id`, `transcript_path`, `cwd`, and `hook_event_name`; completion/input hooks expose useful fields like `last_assistant_message`, `tool_name`, `tool_input`, and `message`.
-- Codex has an official `notify` config command that runs when the agent finishes a turn. Codex also documents lifecycle hooks, but `features.codex_hooks` is under development/off by default, so the installer does not enable Codex hooks automatically.
+- Codex has an official `notify` config command. This tool sends desktop notifications only for Codex completion/failure payloads and ignores start/unknown lifecycle payloads. Codex also documents lifecycle hooks, but `features.codex_hooks` is under development/off by default, so the installer does not enable Codex hooks automatically.
 - Codex does not currently document an external `notify` event for approval-requested or input-needed. The strongest supported Codex path here is smart completion notifications through `notify`.
 - I found no official Claude Code or Codex URI that opens a specific session/thread in VS Code. The supported fallback is opening the project/workspace via VS Code's official `vscode://file/{full path to project}/` URL or `code --reuse-window <cwd>`.
 - macOS clickable notifications from a CLI require a helper. This tool uses `terminal-notifier` because it supports opening a URL on notification click and avoids AppleScript/Script Editor. Linux uses `notify-send`, with action-click support only where the installed notification server and `notify-send` support it.
@@ -119,6 +119,7 @@ The installer adds this managed block to `~/.codex/config.toml` when no existing
 
 ```toml
 # >>> smart-agent-notify
+# Official Codex notify command. smart-agent-notify ignores non-completion lifecycle events.
 notify = ["/path/to/node", "/path/to/repo/dist/src/index.js", "notify", "--provider", "codex"]
 # <<< smart-agent-notify
 ```

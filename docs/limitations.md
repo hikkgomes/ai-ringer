@@ -27,7 +27,7 @@ Sources:
 
 Supported and installed by default:
 
-- Completion: Codex has an official `notify` command setting in `~/.codex/config.toml`; Codex runs it when the agent finishes a turn.
+- Completion: Codex has an official `notify` command setting in `~/.codex/config.toml`; this tool only emits desktop notifications for Codex completion/failure payloads and ignores start/unknown lifecycle payloads.
 - Project context: the tool uses `cwd` when Codex provides it. If a legacy notify payload omits `cwd`, the process working directory is used as the best available fallback.
 
 Supported by Codex docs but not installed by default:

@@ -65,3 +65,44 @@ test("Codex notify payload becomes a completed event", () => {
   assert.match(event.title ?? "", /^Codex:/);
   assert.match(event.title ?? "", /Fixed retry behavior/);
 });
+
+test("Codex task-start payload is suppressed", () => {
+  const event = normalizeCodexEvent({
+    type: "agent-turn-started",
+    "turn-id": "t2",
+    cwd: "/tmp/webhooks",
+    message: "Starting work"
+  });
+
+  assert.equal(event, undefined);
+});
+
+test("Codex payload without an event type is suppressed", () => {
+  const event = normalizeCodexEvent({
+    cwd: "/tmp/webhooks",
+    message: "Starting work"
+  });
+
+  assert.equal(event, undefined);
+});
+
+test("Codex unknown lifecycle payload is suppressed", () => {
+  const event = normalizeCodexEvent({
+    type: "agent-turn-start",
+    cwd: "/tmp/webhooks",
+    message: "Working"
+  });
+
+  assert.equal(event, undefined);
+});
+
+test("Codex hyphenated stop failure payload becomes a failure event", () => {
+  const event = normalizeCodexEvent({
+    hook_event_name: "Stop Failure",
+    cwd: "/tmp/webhooks",
+    reason: "The turn failed"
+  });
+
+  assert.equal(event?.eventType, "failure");
+  assert.equal(event?.rawSummarySource, "The turn failed");
+});
