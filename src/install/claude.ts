@@ -26,7 +26,7 @@ const CLAUDE_EVENTS: Array<{ event: string; matcher?: string }> = [
   { event: "Notification", matcher: "idle_prompt|auth_success" }
 ];
 
-export function installClaude(): InstallResult {
+export function installClaude(options: { force?: boolean } = {}): InstallResult {
   const path = claudeSettingsPath();
   const settings = readClaudeSettings(path);
   const command = commandForProvider("claude");
@@ -34,12 +34,23 @@ export function installClaude(): InstallResult {
   let changed = false;
 
   for (const entry of CLAUDE_EVENTS) {
+    const managedGroup = {
+      ...(entry.matcher ? { matcher: entry.matcher } : {}),
+      hooks: [{ type: "command", command, timeout: 5 }]
+    };
+
+    if (options.force) {
+      const existing = Array.isArray(hooks[entry.event]) ? hooks[entry.event] : [];
+      if (JSON.stringify(existing) !== JSON.stringify([managedGroup])) {
+        hooks[entry.event] = [managedGroup];
+        changed = true;
+      }
+      continue;
+    }
+
     const groups = Array.isArray(hooks[entry.event]) ? hooks[entry.event] : [];
     if (!hasManagedCommand(groups, command, entry.matcher)) {
-      groups.push({
-        ...(entry.matcher ? { matcher: entry.matcher } : {}),
-        hooks: [{ type: "command", command, timeout: 5 }]
-      });
+      groups.push(managedGroup);
       hooks[entry.event] = groups;
       changed = true;
     }
@@ -53,7 +64,13 @@ export function installClaude(): InstallResult {
   ensureParent(path);
   backupIfExists(path);
   writeFileSync(path, `${JSON.stringify(settings, null, 2)}\n`, "utf8");
-  return { changed: true, path, message: "Claude Code hooks configured." };
+  return {
+    changed: true,
+    path,
+    message: options.force
+      ? "Claude Code managed hook events replaced with smart-agent-notify hooks."
+      : "Claude Code hooks configured."
+  };
 }
 
 export function uninstallClaude(): InstallResult {

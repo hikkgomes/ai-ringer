@@ -59,6 +59,20 @@ The installer:
 
 Every config change is idempotent. Existing config files are copied to `*.bak.<timestamp>` before writes.
 
+For a clean reinstall during updates, including replacing old Claude hooks on the managed events and replacing an existing top-level Codex `notify = ...` command, run:
+
+```sh
+npm run setup:force
+```
+
+Equivalent:
+
+```sh
+npm run setup -- --force
+```
+
+Force mode still writes timestamped backups before changing `~/.claude/settings.json` or `~/.codex/config.toml`.
+
 ## Uninstall
 
 ```sh
@@ -110,6 +124,7 @@ notify = ["/path/to/node", "/path/to/repo/dist/src/index.js", "notify", "--provi
 ```
 
 If you already have a Codex `notify` command, the installer leaves it untouched and prints a warning. Chain manually by calling `smart-agent-notify notify --provider codex "$payload"` from your existing notify script.
+To replace the existing command instead, run `npm run setup:force`.
 
 Codex input-needed notifications are not installed because Codex does not currently document an external input-needed/approval-requested notify event. Built-in TUI notifications are separate from this tool and are configured with Codex's `tui.notifications`.
 

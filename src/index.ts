@@ -21,7 +21,7 @@ async function main(): Promise<number> {
       case "fixture":
         return handleFixture(args);
       case "install":
-        for (const message of installAll()) console.log(message);
+        for (const message of installAll({ force: args.includes("--force") })) console.log(message);
         return 0;
       case "uninstall":
         for (const message of uninstallAll(args.includes("--remove-shim"))) console.log(message);
@@ -146,7 +146,7 @@ Usage:
   smart-agent-notify notify --provider claude < payload.json
   smart-agent-notify notify --provider codex '{"type":"agent-turn-complete"}'
   smart-agent-notify fixture --provider claude fixtures/claude-stop.json
-  smart-agent-notify install
+  smart-agent-notify install [--force]
   smart-agent-notify uninstall [--remove-shim]
 `);
 }

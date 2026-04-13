@@ -4,12 +4,13 @@ import { join } from "node:path";
 import { InstallResult } from "../types.js";
 import { argvForProvider, backupIfExists, ensureParent, MANAGED_END, MANAGED_START } from "./common.js";
 
-export function installCodex(): InstallResult {
+export function installCodex(options: { force?: boolean } = {}): InstallResult {
   const path = codexConfigPath();
   const original = existsSync(path) ? readFileSync(path, "utf8") : "";
   const withoutManaged = removeManagedBlock(original);
+  const block = codexManagedBlock();
 
-  if (/^\s*notify\s*=/m.test(withoutManaged)) {
+  if (/^\s*notify\s*=/m.test(withoutManaged) && !options.force) {
     return {
       changed: false,
       path,
@@ -18,8 +19,8 @@ export function installCodex(): InstallResult {
     };
   }
 
-  const block = codexManagedBlock();
-  const next = `${withoutManaged.trimEnd()}${withoutManaged.trim() ? "\n\n" : ""}${block}\n`;
+  const configBase = options.force ? removeTopLevelNotify(withoutManaged) : withoutManaged;
+  const next = prependManagedBlock(configBase, block);
   if (next === original) {
     return { changed: false, path, message: "Codex notify already configured." };
   }
@@ -27,7 +28,13 @@ export function installCodex(): InstallResult {
   ensureParent(path);
   backupIfExists(path);
   writeFileSync(path, next, "utf8");
-  return { changed: true, path, message: "Codex notify command configured." };
+  return {
+    changed: true,
+    path,
+    message: options.force
+      ? "Codex notify command replaced with smart-agent-notify."
+      : "Codex notify command configured."
+  };
 }
 
 export function uninstallCodex(): InstallResult {
@@ -67,6 +74,25 @@ function removeManagedBlock(input: string): string {
     "g"
   );
   return input.replace(pattern, "").trimEnd();
+}
+
+function removeTopLevelNotify(input: string): string {
+  const lines = input.split(/\r?\n/);
+  const output: string[] = [];
+  let inSection = false;
+
+  for (const line of lines) {
+    if (/^\s*\[/.test(line)) inSection = true;
+    if (!inSection && /^\s*notify\s*=/.test(line)) continue;
+    output.push(line);
+  }
+
+  return output.join("\n").trimEnd();
+}
+
+function prependManagedBlock(config: string, block: string): string {
+  const trimmed = config.trim();
+  return trimmed ? `${block}\n\n${trimmed}\n` : `${block}\n`;
 }
 
 function escapeRegExp(value: string): string {

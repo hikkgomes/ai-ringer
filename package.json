@@ -10,6 +10,7 @@
     "build": "tsc -p tsconfig.json",
     "test": "npm run build && node --test dist/test/*.test.js",
     "setup": "node scripts/install.mjs",
+    "setup:force": "node scripts/install.mjs --force",
     "install:local": "npm run build && node dist/src/index.js install",
     "uninstall": "node scripts/uninstall.mjs",
     "uninstall:local": "npm run build && node dist/src/index.js uninstall"

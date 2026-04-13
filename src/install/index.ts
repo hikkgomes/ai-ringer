@@ -2,13 +2,15 @@ import { unlinkSync } from "node:fs";
 import { createLocalShim, localShimPath } from "./common.js";
 import { installClaude, uninstallClaude } from "./claude.js";
 import { installCodex, uninstallCodex } from "./codex.js";
+import { commandExists } from "../utils/command.js";
 
-export function installAll(): string[] {
+export function installAll(options: { force?: boolean } = {}): string[] {
   const messages: string[] = [];
   const shim = createLocalShim();
   messages.push(`Installed local wrapper: ${shim}`);
+  if (options.force) messages.push("Force mode: replacing managed Claude events and top-level Codex notify.");
 
-  for (const result of [installClaude(), installCodex()]) {
+  for (const result of [installClaude(options), installCodex(options)]) {
     messages.push(`${result.changed ? "Updated" : "Unchanged"} ${result.path}: ${result.message}`);
   }
 
@@ -37,5 +39,7 @@ export function uninstallAll(removeShim: boolean): string[] {
 
 function macOSDependencyHint(): string {
   if (process.platform !== "darwin") return "";
-  return "macOS click support requires terminal-notifier. Install it with: brew install terminal-notifier";
+  return commandExists("terminal-notifier")
+    ? "macOS click support: terminal-notifier found."
+    : "macOS click support requires terminal-notifier. Install it with: brew install terminal-notifier";
 }
